@@ -213,7 +213,7 @@
             $.ajax({
                 type: "get",
                 url: url + ":80/blog-posts/",
-                crossDomain: true,
+                /* crossDomain: true, */
                 success: function(d){
                     posts = d;
                     fillPosts();
