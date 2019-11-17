@@ -5,9 +5,9 @@ let {DATABASE_URL, PORT} = require("./config");
 let {PostsCrudo} = require("./blog-post-model");
 let mongoose = require("mongoose")
 
+let app = express();
 app.use( express.static( "public" ) );
 
-let app = express();
 let par = bodyParser.json();
 
 app.use(bodyParser.urlencoded({ extended: true }));
