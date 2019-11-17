@@ -53,6 +53,7 @@ app.get("/blog-post", function(req, res){
 
 app.post("/blog-posts", function(req, res){
 
+    console.log("AAAAAAAAAAAAAAA");
     let got = req.body;
     let validation =
         got.title !== undefined &&
