@@ -172,6 +172,7 @@
         crossorigin="anonymous"></script>
 
     <script>
+        var url = "https://labo8.herokuapp.com";
         var scrEl = ` <div class="scr-element">
                         <div class="elHead">
                             <h3 class="elTitle">:title</h3>
@@ -211,7 +212,7 @@
         var load = function(){
             $.ajax({
                 type: "get",
-                url: "http://localhost:6969/blog-posts/",
+                url: url + ":6969/blog-posts/",
                 crossDomain: true,
                 success: function(d){
                     posts = d;
@@ -266,7 +267,7 @@
 
             $.ajax({
                 type: "delete",
-                url: "http://localhost:6969/blog-posts/" + $(this).data("id"),
+                url: url + ":6969/blog-posts/" + $(this).data("id"),
                 data: $(this).data("id"),
                 dataType: "text",
                 success: function(){
@@ -301,12 +302,10 @@
                 data.author = pAuthor.val();
                 data.publishDate = pDate.val();
 
-                console.log("http://localhost:posts6969/blog-posts/" + data.id);
-
                 $.ajax({
                     type: "put",
                     data: data,
-                    url: "http://localhost:6969/blog-posts/" + data.id,
+                    url: url + ":6969/blog-posts/" + data.id,
                     dataType: "text",
                     success: function(d){
                         newStatus();
@@ -340,7 +339,7 @@
                 $.ajax({
                     type: "post",
                     data: data,
-                    url: "http://localhost:6969/blog-posts/",
+                    url: url + ":6969/blog-posts/",
                     success: function(d){
                         posts = d;
                         newStatus();
