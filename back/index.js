@@ -1,6 +1,9 @@
 let express = require("express");
 let bodyParser = require("body-parser");
 let uuid = require("uuid");
+let {DATABASE_URL, PORT} = require("./config");
+let {PostsCrudo} = require("./blog-post-model");
+let mongoose = require("mongoose")
 
 let app = express();
 let par = bodyParser.json();
@@ -9,9 +12,17 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.get("/blog-posts", function(req, res){
-    res.status(200);
+    PostsCrudo.get().then(blogs => {
+        res.status(200).json(blogs);
+    })
+    .catch(e => {
+        console.log("ño");
+        console.log(e);
+        
+    })
+/*     res.status(200);
     res.statusMessage = "OK";
-    res.json(data);
+    res.json(data); */
 });
 
 app.get("/blog-post", function(req, res){
@@ -39,7 +50,39 @@ app.get("/blog-post", function(req, res){
 });
 
 app.post("/blog-posts", function(req, res){
+
     let got = req.body;
+    let validation =
+        got.title !== undefined &&
+        got.content !== undefined &&
+        got.author !== undefined &&
+        got.publishDate !== undefined;
+    
+    if(validation === true){
+        let eras = uuid.v4();
+        
+        got.id = eras;
+
+        PostsCrudo.post(got)
+            .then(blogs => {
+                res.statusMessage = "OK";
+                res.status(200).json(blogs);
+            })
+            .catch(e => {
+                console.log("ño");
+                console.log(e);
+                
+            })
+
+
+    }
+    else{
+        res.status(406);
+        res.statusMessage = "Incomplete post";
+        res.send();
+    }
+
+/*     let got = req.body;
     console.log(got);
     let validation =
         got.title !== undefined &&
@@ -61,11 +104,27 @@ app.post("/blog-posts", function(req, res){
         res.status(406);
         res.statusMessage = "Incomplete post";
         res.send();
-    }
+    } */
+    
 });
 
 app.delete("/blog-posts/:id", function(req,res){
-    let idDel = data.findIndex((value, index, arr) =>{
+    let id = req.params.id;
+    PostsCrudo.delete(id)
+            .then(() =>{
+                res.statusMessage = "OK";
+                res.status(200);
+                res.send();
+                return true;
+            })
+            .catch(error => {
+                res.statusMessage = "Not found";
+                res.status(404);
+                res.send();
+                return error;
+            })
+
+    /* let idDel = data.findIndex((value, index, arr) =>{
         return (value.id === req.params.id);
     });
 
@@ -78,7 +137,7 @@ app.delete("/blog-posts/:id", function(req,res){
         res.statusMessage = "OK";
         res.status(200);
     }
-    res.send();
+    res.send(); */
 });
 
 app.put("/blog-posts/:id", function(req, res){
@@ -95,7 +154,20 @@ app.put("/blog-posts/:id", function(req, res){
         return;
     }
 
-    let ddd = data.find((val) => {
+    PostsCrudo.update(req.body.id, req.body)
+            .then(r => {
+                res.status(202); 
+                res.statusMessage = "OK";
+                res.json(r);
+            })
+            .catch(r => {
+                res.status(404);
+                res.statusMessage = "Post not found";
+                res.send();
+                return;
+            })
+
+    /* let ddd = data.find((val) => {
         return (val.id == req.body.id);
     });
 
@@ -113,13 +185,9 @@ app.put("/blog-posts/:id", function(req, res){
         ddd[a] = req.body[a];
     }
 
-    res.status(202);
+    res.status(202); 
     res.statusMessage = "OK";
-    res.json(ddd);
-});
-
-app.listen(6969, "localhost", (e)=>{
-    console.log("OK");
+    res.json(ddd); */
 });
 
 let data = [
@@ -131,3 +199,50 @@ let data = [
         publishDate: new Date().getDate()
     }
 ]
+
+
+let server;
+
+function runServer(port, databaseUrl){
+	return new Promise( (resolve, reject ) => {
+		mongoose.connect(databaseUrl, response => {
+			if ( response ){
+				return reject(response);
+			}
+			else{
+				server = app.listen(port, () => {
+					console.log( "App is running on port " + port );
+					resolve();
+				})
+				.on( 'error', err => {
+					mongoose.disconnect();
+					return reject(err);
+				})
+			}
+		});
+	});
+}
+
+function closeServer(){
+	return mongoose.disconnect()
+		.then(() => {
+			return new Promise((resolve, reject) => {
+				console.log('Closing the server');
+				server.close( err => {
+					if (err){
+						return reject(err);
+					}
+					else{
+						resolve();
+					}
+				});
+			});
+		});
+}
+
+runServer( PORT, DATABASE_URL )
+	.catch( err => {
+		console.log( err );
+	});
+
+module.exports = { app, runServer, closeServer };
