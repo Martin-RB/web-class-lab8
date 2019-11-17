@@ -73,7 +73,8 @@ app.post("/blog-posts", function(req, res){
             .catch(e => {
                 console.log("ño");
                 console.log(e);
-                
+                res.statusMessage = "ño";
+                res.status(500).send();
             })
 
 
