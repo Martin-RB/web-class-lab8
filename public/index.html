@@ -212,7 +212,7 @@
         var load = function(){
             $.ajax({
                 type: "get",
-                url: url + ":80/blog-posts/",
+                url: "/blog-posts/",
                 /* crossDomain: true, */
                 success: function(d){
                     posts = d;
@@ -267,7 +267,7 @@
 
             $.ajax({
                 type: "delete",
-                url: url + ":80/blog-posts/" + $(this).data("id"),
+                url: "/blog-posts/" + $(this).data("id"),
                 data: $(this).data("id"),
                 dataType: "text",
                 success: function(){
@@ -305,7 +305,7 @@
                 $.ajax({
                     type: "put",
                     data: data,
-                    url: url + ":80/blog-posts/" + data.id,
+                    url: "/blog-posts/" + data.id,
                     dataType: "text",
                     success: function(d){
                         newStatus();
@@ -339,7 +339,7 @@
                 $.ajax({
                     type: "post",
                     data: data,
-                    url: url + ":80/blog-posts/",
+                    url: "/blog-posts/",
                     success: function(d){
                         posts = d;
                         newStatus();
